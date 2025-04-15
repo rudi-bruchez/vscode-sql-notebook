@@ -6,6 +6,7 @@ import {
   VSCodeOption,
   VSCodeCheckbox,
 } from '@vscode/webview-ui-toolkit/react';
+import { Checkbox } from '@vscode/webview-ui-toolkit';
 
 const Form: React.FC<{ handleSubmit: (form: HTMLFormElement) => void }> = ({
   handleSubmit,
@@ -112,6 +113,9 @@ function showDriverConfig(driver: string) {
     case 'mssql':
       return (
         <>
+          <VSCodeCheckbox name="trustedConnection" checked>
+            Trusted Connection
+          </VSCodeCheckbox>
           <VSCodeCheckbox name="encrypt" checked>
             Encrypt
           </VSCodeCheckbox>

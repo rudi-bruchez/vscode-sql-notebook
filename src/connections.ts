@@ -94,6 +94,7 @@ export type ConnData =
       user: string;
       passwordKey: string;
       database: string;
+      // trustedConnection: boolean | false;
     } & {
       [key: string]: any;
     })
@@ -113,14 +114,14 @@ export class ConnectionListItem extends vscode.TreeItem {
     super(config.name, collapsibleState);
     if (isActive) {
       this.iconPath = {
-        dark: path.join(mediaDir, 'dark', 'dbconnection.svg'),
-        light: path.join(mediaDir, 'light', 'dbconnection.svg'),
+        dark: vscode.Uri.file(path.join(mediaDir, 'dark', 'dbconnection.svg')),
+        light: vscode.Uri.file(path.join(mediaDir, 'light', 'dbconnection.svg')),
       };
       this.description = 'Connected!';
     } else {
       this.iconPath = {
-        dark: path.join(mediaDir, 'dark', 'database.svg'),
-        light: path.join(mediaDir, 'light', 'database.svg'),
+        dark: vscode.Uri.file(path.join(mediaDir, 'dark', 'database.svg')),
+        light: vscode.Uri.file(path.join(mediaDir, 'light', 'database.svg')),
       };
       this.description = 'Inactive';
     }

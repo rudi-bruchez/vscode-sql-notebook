@@ -16,7 +16,7 @@ jobs:
       - name: Prepare to upload
         run: cp result sqlnotebook-${{ github.sha }}.vsix
       - name: Upload vsix as artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: sqlnotebook-${{ github.sha }}.vsix
           path: sqlnotebook-${{ github.sha }}.vsix

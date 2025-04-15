@@ -21,6 +21,10 @@ function handleSubmit(form: HTMLFormElement) {
     // if "on", we want `true`, if nullish, we want false
     data.trustServerCertificate = !!data.trustServerCertificate;
   }
+  if (data.trustedConnection) {
+    // if "on", we want `true`, if nullish, we want false
+    data.trustedConnection = !!data.trustedConnection;
+  }
 
   createConnection(data);
 }

@@ -301,6 +301,7 @@ interface MSSQLConfig extends BaseConfig {
   driver: 'mssql';
   encrypt: boolean;
   trustServerCertificate: boolean;
+  trustedConnection: boolean;
 }
 
 async function createMSSQLPool(config: MSSQLConfig): Promise<Pool> {
@@ -313,6 +314,7 @@ async function createMSSQLPool(config: MSSQLConfig): Promise<Pool> {
     requestTimeout: config.queryTimeout,
     options: {
       encrypt: config.encrypt,
+      trustedConnection: config.trustedConnection,
       trustServerCertificate: config.trustServerCertificate,
     },
   });
