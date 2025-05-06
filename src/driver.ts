@@ -7,7 +7,7 @@ import type { Database as SqliteDatabase } from 'sql.js';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-const supportedDrivers = ['mysql', 'postgres', 'mssql', 'sqlite'] as const;
+const supportedDrivers = ['mysql', 'postgres', 'mssql', 'sqlite', 'msnodesqlv8'] as const;
 
 export type DriverKey = typeof supportedDrivers[number];
 
@@ -298,7 +298,7 @@ function postgresConn(conn: pg.PoolClient): Conn {
 }
 
 interface MSSQLConfig extends BaseConfig {
-  driver: 'mssql';
+  driver: 'msnodesqlv8';
   encrypt: boolean;
   trustServerCertificate: boolean;
   trustedConnection: boolean;
@@ -318,7 +318,7 @@ async function createMSSQLPool(config: MSSQLConfig): Promise<Pool> {
         trustedConnection: config.trustedConnection,
         trustServerCertificate: config.trustServerCertificate,
       },
-      driver: "msnodesqlv8", // Required if using Windows Authentication
+      driver: 'msnodesqlv8', // Required if using Windows Authentication
     });  
   } else {
     conn = await mssql.connect({
@@ -330,8 +330,9 @@ async function createMSSQLPool(config: MSSQLConfig): Promise<Pool> {
       requestTimeout: config.queryTimeout,
       options: {
         encrypt: config.encrypt,
-        trustedConnection: config.trustedConnection,
+        trustServerCertificate: config.trustServerCertificate,
       },
+      driver: 'mssql',
     });  
   }
 
