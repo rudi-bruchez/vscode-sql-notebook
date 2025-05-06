@@ -305,19 +305,36 @@ interface MSSQLConfig extends BaseConfig {
 }
 
 async function createMSSQLPool(config: MSSQLConfig): Promise<Pool> {
-  const conn = await mssql.connect({
-    server: config.host,
-    port: config.port,
-    user: config.user,
-    password: config.password,
-    database: config.database,
-    requestTimeout: config.queryTimeout,
-    options: {
-      encrypt: config.encrypt,
-      trustedConnection: config.trustedConnection,
-      trustServerCertificate: config.trustServerCertificate,
-    },
-  });
+  let conn: mssql.ConnectionPool;
+
+  if (config.trustedConnection) {
+    conn = await mssql.connect({
+      server: config.host,
+      port: config.port,
+      database: config.database,
+      requestTimeout: config.queryTimeout,
+      options: {
+        encrypt: config.encrypt,
+        trustedConnection: config.trustedConnection,
+        trustServerCertificate: config.trustServerCertificate,
+      },
+      driver: "msnodesqlv8", // Required if using Windows Authentication
+    });  
+  } else {
+    conn = await mssql.connect({
+      server: config.host,
+      port: config.port,
+      user: config.user,
+      password: config.password,
+      database: config.database,
+      requestTimeout: config.queryTimeout,
+      options: {
+        encrypt: config.encrypt,
+        trustedConnection: config.trustedConnection,
+      },
+    });  
+  }
+
   return mssqlPool(conn);
 }
 
