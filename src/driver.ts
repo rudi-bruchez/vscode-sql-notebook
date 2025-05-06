@@ -1,13 +1,19 @@
 import * as mysql from 'mysql2/promise';
 import * as pg from 'pg';
-import * as mssql from 'mssql';
+// import * as mssql from 'mssql';
+// import SqlClient from "msnodesqlv8/types";
+import sql from 'msnodesqlv8';
+// const mssql: SqlClient = require("msnodesqlv8");
+const mssql = require("mssql/msnodesqlv8");
+
 import initSqlJs from 'sql.js';
 import * as fs from 'fs/promises';
 import type { Database as SqliteDatabase } from 'sql.js';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { pool } from 'mssql';
 
-const supportedDrivers = ['mysql', 'postgres', 'mssql', 'sqlite', 'msnodesqlv8'] as const;
+const supportedDrivers = ['mysql', 'postgres', 'msnodesqlv8', 'sqlite'] as const;
 
 export type DriverKey = typeof supportedDrivers[number];
 
@@ -44,7 +50,7 @@ export async function getPool(c: PoolConfig): Promise<Pool> {
   switch (c.driver) {
     case 'mysql':
       return createMySQLPool(c);
-    case 'mssql':
+    case 'msnodesqlv8':
       return createMSSQLPool(c);
     case 'postgres':
       return createPostgresPool(c);
@@ -305,44 +311,31 @@ interface MSSQLConfig extends BaseConfig {
 }
 
 async function createMSSQLPool(config: MSSQLConfig): Promise<Pool> {
-  let conn: mssql.ConnectionPool;
+  // let conn: mssql.Connection;
+  let connectionString = 'Driver={ODBC Driver 17 for SQL Server};' 
+       + `Server=${config.host};Database=${config.database};`;
 
   if (config.trustedConnection) {
-    conn = await mssql.connect({
-      server: config.host,
-      port: config.port,
-      database: config.database,
-      requestTimeout: config.queryTimeout,
-      options: {
-        encrypt: config.encrypt,
-        trustedConnection: config.trustedConnection,
-        trustServerCertificate: config.trustServerCertificate,
-      },
-      driver: 'msnodesqlv8', // Required if using Windows Authentication
-    });  
+    connectionString += 'Trusted_Connection=yes;';
   } else {
-    conn = await mssql.connect({
-      server: config.host,
-      port: config.port,
-      user: config.user,
-      password: config.password,
-      database: config.database,
-      requestTimeout: config.queryTimeout,
-      options: {
-        encrypt: config.encrypt,
-        trustServerCertificate: config.trustServerCertificate,
-      },
-      driver: 'mssql',
-    });  
+    connectionString += `UID=${config.user};PWD=${config.password};`;
   }
 
-  return mssqlPool(conn);
+  if (config.encrypt) {
+    connectionString += 'Encrypt=yes;TrustServerCertificate=yes;';
+  } else {
+    connectionString += 'Encrypt=no;';
+  }
+
+  return mssqlPool(new sql.Pool({
+    connectionString: connectionString
+  }));
 }
 
-function mssqlPool(pool: mssql.ConnectionPool): Pool {
+function mssqlPool(pool: MsNodeSqlV8.Pool): Pool {
   return {
     async getConnection(): Promise<Conn> {
-      const req = new mssql.Request();
+      const req = pool.query('SELECT 1 AS test');
       return mssqlConn(req);
     },
     end() {
@@ -351,14 +344,14 @@ function mssqlPool(pool: mssql.ConnectionPool): Pool {
   };
 }
 
-function mssqlConn(req: mssql.Request): Conn {
+function mssqlConn(req: MsNodeSqlV8.Query): Conn {
   return {
     destroy() {
-      req.cancel();
+      req.cancelQuery();
     },
     async query(q: string): Promise<ExecutionResult> {
       // TODO: support multiple queries
-      const res = await req.query(q);
+      const res = await pool.request().query(q);
       if (res.recordsets.length < 1) {
         return [[{ rows_affected: `${res.rowsAffected}` }]];
       }

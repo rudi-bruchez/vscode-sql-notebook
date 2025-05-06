@@ -6,6 +6,6 @@
     "lib": ["ES2019", "dom"],
     "outDir": "../dist/webview",
     "moduleResolution": "node",
-    "strict": true
+    "strict": true,
   }
 }
