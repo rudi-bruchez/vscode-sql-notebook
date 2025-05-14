@@ -39,7 +39,8 @@ const Form: React.FC<{ handleSubmit: (form: HTMLFormElement) => void }> = ({
         <VSCodeDropdown name="driver" ref={dropdownRef}>
           <VSCodeOption>mysql</VSCodeOption>
           <VSCodeOption>postgres</VSCodeOption>
-          <VSCodeOption>mssql</VSCodeOption>
+          {/* <VSCodeOption label="mssql">msnodesqlv8</VSCodeOption> */}
+          <VSCodeOption>msnodesqlv8</VSCodeOption>
           <VSCodeOption>sqlite</VSCodeOption>
         </VSCodeDropdown>
       </div>

@@ -56,7 +56,8 @@ export class SQLNotebookConnections
           vscode.TreeItemCollapsibleState.None
         ),
         new vscode.TreeItem(
-          `user: ${element.config.user}`,
+          (element.config.driver === 'msnodesqlv8' && element.config.trustedConnection) ? 
+            `trustedConnection` : `user: ${element.config.user}`,
           vscode.TreeItemCollapsibleState.None
         ),
         new vscode.TreeItem(

@@ -67,7 +67,7 @@ interface BaseConfig {
   driver: DriverKey;
   host: string;
   port: number;
-  user: string;
+  user?: string;
   password?: string;
   database?: string;
 
